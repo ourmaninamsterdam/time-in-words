@@ -17,25 +17,11 @@ const numbers = [,
   'fourteen',
   'fifteen',
   'sixteen',
+  'seventeen',
   'eighteen',
   'nineteen',
-  'twenty'
+  'twenty',
 ];
-
-/**
- *
- * 10:00 - ten o'clock
- * 02:15 - quarter past two
- * 9:30 - half past nine
- * 07:45 - quarter to eight
- *
- * 05:56 - four minutes to six
- * 10:26 - twenty six minutes past ten
- * 11:34 - thirty minutes to twelve
- * 03:13 - thirteen minutes past three
- */
-
-// {noOfMins=thirteen minuteLabel=minutes past=preposition hour=three}
 
 const createTimeInWords = (numbersAsWords: Array<string>): function => {
   return (hourNumeral: number, minuteNumeral: number): string => {
@@ -63,10 +49,13 @@ const createTimeInWords = (numbersAsWords: Array<string>): function => {
       output.push('quarter', prepositions.to, numbersAsWords[hourNumeral]);
     }
 
-    if(minuteNumeral > 45 && minuteNumeral < 60) {
+    if(minuteNumeral > 30 && minuteNumeral < 45 || minuteNumeral > 45 && minuteNumeral < 60) {
       const minutesDifference = 60 - minuteNumeral;
+      const numberAsWord = minutesDifference > 20
+          ? `${numbers[20]} ${numbers[minutesDifference % 20]}`
+          : numbers[minutesDifference];
       const duration = minutesDifference > 1? durationPlural : durationSingular;
-      output.push(numbersAsWords[minutesDifference], duration, prepositions.to, numbersAsWords[hourNumeral+1])
+      output.push(numberAsWord, duration, prepositions.to, numbersAsWords[hourNumeral+1])
     }
 
     return output.join(' ');
