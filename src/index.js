@@ -44,6 +44,8 @@ const createTimeInWords = (numbersAsWords: Array<string>): function => {
       past: 'past',
       to: 'to',
     };
+    const durationPlural = 'minutes';
+    const durationSingular = 'minute';
 
     if (minuteNumeral === 0) {
       output.push(numbersAsWords[hourNumeral], 'o\'clock');
@@ -59,6 +61,12 @@ const createTimeInWords = (numbersAsWords: Array<string>): function => {
 
     if (minuteNumeral === 45) {
       output.push('quarter', prepositions.to, numbersAsWords[hourNumeral]);
+    }
+
+    if(minuteNumeral > 45 && minuteNumeral < 60) {
+      const minutesDifference = 60 - minuteNumeral;
+      const duration = minutesDifference > 1? durationPlural : durationSingular;
+      output.push(numbersAsWords[minutesDifference], duration, prepositions.to, numbersAsWords[hourNumeral+1])
     }
 
     return output.join(' ');
