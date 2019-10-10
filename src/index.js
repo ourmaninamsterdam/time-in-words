@@ -40,12 +40,12 @@ const DEFINITIONS_ENGLISH = {
 };
 
 const CONFIG_ENGLISH: {
-  default: string
+  cases: Array<any>
 } = {
-  default: '{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}',
   cases: [
     ['{{hours}} {{hourMarker}}', [0]],
-    ['{{fraction}} {{preposition}} {{hours}}', [15, 30, 45]]
+    ['{{fraction}} {{preposition}} {{hours}}', [15, 30, 45]],
+    ['{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}', []]
   ]
 };
 
@@ -170,24 +170,27 @@ const createTimeInWords = (
     const preposition = getPreposition(minuteNumeral);
     const minutes = getMinutes(minuteNumeral, preposition);
     const hours = getHour(hourNumeral, preposition);
-    const { defaultCase, cases } = templates[language];
+    const { cases } = templates[language];
     const definitionsMap = definitions[language];
 
-    console.log(definitionsMap);
-
-    cases.forEach(caseItem => {
-      const [template, ranges] = caseItem;
-
+    for (let item = 0; item < cases.slice(0, cases.length - 1).length; item++) {
+      const [template, ranges] = cases[item];
       if (ranges.includes(minuteNumeral)) {
         templateString.push(template);
+        break;
       }
-    });
+    }
+
+    if (templateString.length === 0) {
+      const [template] = cases[cases.length - 1];
+      templateString.push(template);
+    }
 
     return template(templateString.join(' '), {
       minutesLabel: definitionsMap[getMinutesLabel(minutes)],
       minutes: convertNumbersToWords(minutes),
       hours: convertNumbersToWords(hours),
-      hourMarker: definitionsMap['HOUR_MARKER'],
+      hourMarker: definitionsMap[HOUR_MARKER],
       fraction: definitionsMap[getTimeFraction(minuteNumeral)],
       preposition: definitionsMap[preposition]
     });
