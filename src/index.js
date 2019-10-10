@@ -1,5 +1,62 @@
 // @flow
 
+const MINUTES_LABEL_PLURAL = 'MINUTES_LABEL_PLURAL';
+const MINUTES_LABEL_SINGULAR = 'MINUTES_LABEL_SINGULAR';
+const PREPOSITION_TO = 'PREPOSITION_TO';
+const PREPOSITION_PAST = 'PREPOSITION_PAST';
+const QUARTER = 'QUARTER';
+const HALF = 'HALF';
+const HOUR_MARKER = 'HOUR_MARKER';
+const LANGUAGE_ENGLISH = 'en';
+
+type LANGUAGE = typeof LANGUAGE_ENGLISH;
+
+const templateStrings = {
+  HOUR_MARKER: '{{hourMarker}}',
+  HOURS: '{{hours}}',
+  MINUTES: '{{minutes}}',
+  MINUTES_LABEL: '{{minutesLabel}}',
+  PREPOSITION: '{{preposition}}',
+  FRACTION: '{{fraction}}'
+};
+
+const templateStringsMap = {
+  MINUTES_LABEL_PLURAL: 'MINUTES_LABEL_PLURAL',
+  MINUTES_LABEL_SINGULAR: 'MINUTES_LABEL_SINGULAR',
+  PREPOSITION_TO: 'PREPOSITION_TO',
+  PREPOSITION_PAST: 'PREPOSITION_PAST',
+  QUARTER: 'QUARTER',
+  HALF: 'HALF'
+};
+
+const DEFINITIONS_ENGLISH = {
+  [HOUR_MARKER]: "o'clock",
+  [QUARTER]: 'quarter',
+  [HALF]: 'half',
+  [PREPOSITION_PAST]: 'past',
+  [PREPOSITION_TO]: 'to',
+  [MINUTES_LABEL_PLURAL]: 'minutes',
+  [MINUTES_LABEL_SINGULAR]: 'minute'
+};
+
+const CONFIG_ENGLISH: {
+  default: string
+} = {
+  default: '{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}',
+  cases: [
+    ['{{hours}} {{hourMarker}}', [0]],
+    ['{{fraction}} {{preposition}} {{hours}}', [15, 30, 45]]
+  ]
+};
+
+const DEFINITIONS = {
+  [LANGUAGE_ENGLISH]: DEFINITIONS_ENGLISH
+};
+
+const TEMPLATES = {
+  [LANGUAGE_ENGLISH]: CONFIG_ENGLISH
+};
+
 const numbers = [
   ,
   'one',
@@ -23,41 +80,6 @@ const numbers = [
   'nineteen',
   'twenty'
 ];
-
-const MINUTES_LABEL_PLURAL = 'MINUTES_LABEL_PLURAL';
-const MINUTES_LABEL_SINGULAR = 'MINUTES_LABEL_SINGULAR';
-const PREPOSITION_TO = 'PREPOSITION_TO';
-const PREPOSITION_PAST = 'PREPOSITION_PAST';
-const QUARTER = 'QUARTER';
-const HALF = 'HALF';
-
-const templateStrings = {
-  HOUR_MARKER: '{{hourMarker}}',
-  HOURS: '{{hours}}',
-  MINUTES: '{{minutes}}',
-  MINUTES_LABEL: '{{minutesLabel}}',
-  PREPOSITION: '{{preposition}}',
-  FRACTION: '{{fraction}}'
-};
-
-const templateStringsMap = {
-  MINUTES_LABEL_PLURAL: 'MINUTES_LABEL_PLURAL',
-  MINUTES_LABEL_SINGULAR: 'MINUTES_LABEL_SINGULAR',
-  PREPOSITION_TO: 'PREPOSITION_TO',
-  PREPOSITION_PAST: 'PREPOSITION_PAST',
-  QUARTER: 'QUARTER',
-  HALF: 'HALF'
-};
-
-const templateMap = {
-  [templateStrings.HOUR_MARKER]: "o'clock",
-  [QUARTER]: 'quarter',
-  [HALF]: 'half',
-  [PREPOSITION_PAST]: 'past',
-  [PREPOSITION_TO]: 'to',
-  [MINUTES_LABEL_PLURAL]: 'minutes',
-  [MINUTES_LABEL_SINGULAR]: 'minute'
-};
 
 const isBetween = (x: number, min: number, max: number): boolean =>
   x >= min && x <= max;
@@ -128,18 +150,14 @@ const getMinutesLabel = (minutes: number): string => {
 
 const createTimeInWords = (
   numbersAsWords: Array<string>,
-  {
-    HOURS,
-    HOUR_MARKER,
-    MINUTES,
-    MINUTES_LABEL,
-    PREPOSITION,
-    QUARTER,
-    HALF,
-    FRACTION
-  }: { [string]: string | number }
+  templates: any,
+  definitions: any
 ): Function => {
-  return (hourNumeral: number, minuteNumeral: number): ?string => {
+  const timeInWords = (
+    hourNumeral: number,
+    minuteNumeral: number,
+    language: LANGUAGE = 'en'
+  ): ?string => {
     if (
       hourNumeral <= 0 ||
       minuteNumeral < 0 ||
@@ -152,24 +170,30 @@ const createTimeInWords = (
     const preposition = getPreposition(minuteNumeral);
     const minutes = getMinutes(minuteNumeral, preposition);
     const hours = getHour(hourNumeral, preposition);
+    const { defaultCase, cases } = templates[language];
+    const definitionsMap = definitions[language];
 
-    if (minuteNumeral === 0) {
-      templateString.push(HOURS, HOUR_MARKER);
-    } else if ([15, 30, 45].includes(minuteNumeral)) {
-      templateString.push(FRACTION, PREPOSITION, HOURS);
-    } else {
-      templateString.push(MINUTES, MINUTES_LABEL, PREPOSITION, HOURS);
-    }
+    console.log(definitionsMap);
+
+    cases.forEach(caseItem => {
+      const [template, ranges] = caseItem;
+
+      if (ranges.includes(minuteNumeral)) {
+        templateString.push(template);
+      }
+    });
 
     return template(templateString.join(' '), {
-      minutesLabel: templateMap[getMinutesLabel(minutes)],
+      minutesLabel: definitionsMap[getMinutesLabel(minutes)],
       minutes: convertNumbersToWords(minutes),
       hours: convertNumbersToWords(hours),
-      hourMarker: templateMap[HOUR_MARKER],
-      fraction: templateMap[getTimeFraction(minuteNumeral)],
-      preposition: templateMap[preposition]
+      hourMarker: definitionsMap['HOUR_MARKER'],
+      fraction: definitionsMap[getTimeFraction(minuteNumeral)],
+      preposition: definitionsMap[preposition]
     });
   };
+
+  return timeInWords;
 };
 
-export default createTimeInWords(numbers, templateStrings);
+export default createTimeInWords(numbers, TEMPLATES, DEFINITIONS);
