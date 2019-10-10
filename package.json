@@ -1,7 +1,7 @@
 {
   "name": "time-in-words",
   "author": "Justin Perry",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Returns the time in words (in English) given valid hour and minute parameters.",
   "repository": "https://github.com/ourmaninamsterdam/time-in-words",
   "scripts": {
