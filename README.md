@@ -1,4 +1,4 @@
-# time-in-words
+# time-in-words [![Build Status](https://travis-ci.com/ourmaninamsterdam/time-in-words.svg?token=YXchmSx7dBJfsDqLqwdv&branch=master)](https://travis-ci.com/ourmaninamsterdam/time-in-words)
 
 Returns the time in words (for English) given an hour and minute parameters. 
 
