@@ -72,11 +72,13 @@ const template = (
   });
 
 const convertNumbersToWords = (number: number): string => {
-  return number >= 20
+  return number > 20
     ? number
         .toString()
         .split('')
-        .map(number => numbers[parseInt(number, 10)])
+        .map((num, index) =>
+          index === 0 ? numbers[20] : numbers[parseInt(num, 10)]
+        )
         .join(' ')
     : numbers[number];
 };
