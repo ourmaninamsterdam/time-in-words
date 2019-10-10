@@ -4,7 +4,7 @@ Returns the time in words (for English) given an hour and minute parameters.
 
 Examples
 
-```
+```javascript
 timeInWords(1, 01) // one o'clock
 timeInWords(1, 01) // one minute past one
 timeInWords(1, 08) // eight minutes past one
