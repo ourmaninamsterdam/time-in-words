@@ -1,4 +1,10 @@
-# time-in-words [![Build Status](https://travis-ci.com/ourmaninamsterdam/time-in-words.svg?token=YXchmSx7dBJfsDqLqwdv&branch=master)](https://travis-ci.com/ourmaninamsterdam/time-in-words)
+<h1 align="center">time-in-words</h1>
+
+<p align="center">
+    <a href="https://www.npmjs.com/package/time-in-words"><img src="https://travis-ci.com/ourmaninamsterdam/time-in-words.svg?token=YXchmSx7dBJfsDqLqwdv&branch=master"></a>
+    <a href="https://travis-ci.org/ourmaninamsterdam/time-in-words"><img src="https://img.shields.io/npm/v/time-in-words.svg"></a>
+</p>
+
 
 Returns the time in words (in English) given valid hour and minute parameters. 
 
