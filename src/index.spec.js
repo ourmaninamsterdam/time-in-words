@@ -54,7 +54,9 @@ it('should output the time in words "half past {hour}" for half past the hour', 
 
 it('should output the time in words "quarter to {hour}" for quarter to the hour', () => {
   hoursInDay.forEach(hour => {
-    return expect(timeInWords(hour, 45)).toEqual(`quarter to ${numbers[hour]}`);
+    return expect(timeInWords(hour, 45)).toEqual(
+      `quarter to ${numbers[hour + 1]}`
+    );
   });
 });
 
