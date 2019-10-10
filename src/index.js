@@ -1,5 +1,19 @@
 // @flow
 
+const LANGUAGE_ENGLISH = 'en';
+
+type LANGUAGE = typeof LANGUAGE_ENGLISH;
+type DEFINITION = {
+  cases: Array<any>,
+  numbers: Array<?string>,
+  templateReplacements: {
+    [string]: string
+  }
+};
+type TYPE_DEFINITIONS = {
+  [LANGUAGE]: DEFINITION
+};
+
 const MINUTES_LABEL_PLURAL = 'MINUTES_LABEL_PLURAL';
 const MINUTES_LABEL_SINGULAR = 'MINUTES_LABEL_SINGULAR';
 const PREPOSITION_TO = 'PREPOSITION_TO';
@@ -7,9 +21,6 @@ const PREPOSITION_PAST = 'PREPOSITION_PAST';
 const QUARTER = 'QUARTER';
 const HALF = 'HALF';
 const HOUR_MARKER = 'HOUR_MARKER';
-const LANGUAGE_ENGLISH = 'en';
-
-type LANGUAGE = typeof LANGUAGE_ENGLISH;
 
 const templateStrings = {
   HOUR_MARKER: '{{hourMarker}}',
@@ -29,57 +40,53 @@ const templateStringsMap = {
   HALF: 'HALF'
 };
 
-const DEFINITIONS_ENGLISH = {
-  [HOUR_MARKER]: "o'clock",
-  [QUARTER]: 'quarter',
-  [HALF]: 'half',
-  [PREPOSITION_PAST]: 'past',
-  [PREPOSITION_TO]: 'to',
-  [MINUTES_LABEL_PLURAL]: 'minutes',
-  [MINUTES_LABEL_SINGULAR]: 'minute'
-};
-
-const CONFIG_ENGLISH: {
-  cases: Array<any>
-} = {
-  cases: [
-    ['{{hours}} {{hourMarker}}', [0]],
-    ['{{fraction}} {{preposition}} {{hours}}', [15, 30, 45]],
-    ['{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}', []]
-  ]
-};
-
-const DEFINITIONS = {
-  [LANGUAGE_ENGLISH]: DEFINITIONS_ENGLISH
-};
-
-const TEMPLATES = {
-  [LANGUAGE_ENGLISH]: CONFIG_ENGLISH
-};
-
-const numbers = [
-  ,
-  'one',
-  'two',
-  'three',
-  'four',
-  'five',
-  'six',
-  'seven',
-  'eight',
-  'nine',
-  'ten',
-  'eleven',
-  'twelve',
-  'thirteen',
-  'fourteen',
-  'fifteen',
-  'sixteen',
-  'seventeen',
-  'eighteen',
-  'nineteen',
-  'twenty'
+const CASES_ENGLISH = [
+  ['{{hours}} {{hourMarker}}', [0]],
+  ['{{fraction}} {{preposition}} {{hours}}', [15, 30, 45]],
+  ['{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}', []]
 ];
+
+const DEFINITIONS: TYPE_DEFINITIONS = {
+  [LANGUAGE_ENGLISH]: {
+    cases: CASES_ENGLISH,
+    numbers: [
+      ,
+      'one',
+      'two',
+      'three',
+      'four',
+      'five',
+      'six',
+      'seven',
+      'eight',
+      'nine',
+      'ten',
+      'eleven',
+      'twelve',
+      'thirteen',
+      'fourteen',
+      'fifteen',
+      'sixteen',
+      'seventeen',
+      'eighteen',
+      'nineteen',
+      'twenty'
+    ],
+    templateReplacements: {
+      [HOUR_MARKER]: "o'clock",
+      [QUARTER]: 'quarter',
+      [HALF]: 'half',
+      [PREPOSITION_PAST]: 'past',
+      [PREPOSITION_TO]: 'to',
+      [MINUTES_LABEL_PLURAL]: 'minutes',
+      [MINUTES_LABEL_SINGULAR]: 'minute'
+    }
+  }
+};
+
+const CONFIG = {
+  [LANGUAGE_ENGLISH]: DEFINITIONS[LANGUAGE_ENGLISH]
+};
 
 const isBetween = (x: number, min: number, max: number): boolean =>
   x >= min && x <= max;
@@ -93,7 +100,10 @@ const template = (
     return typeof r === 'string' || typeof r === 'number' ? r.toString() : a;
   });
 
-const convertNumbersToWords = (number: number): string => {
+const convertNumbersToWords = (
+  numbers: Array<?string>,
+  number: number
+): string => {
   return number > 20
     ? number
         .toString()
@@ -102,7 +112,9 @@ const convertNumbersToWords = (number: number): string => {
           index === 0 ? numbers[20] : numbers[parseInt(num, 10)]
         )
         .join(' ')
-    : numbers[number];
+    : typeof numbers[number] === 'string'
+    ? numbers[number]
+    : '';
 };
 
 const getTimeFraction = (minute: number): string => {
@@ -148,11 +160,14 @@ const getMinutesLabel = (minutes: number): string => {
   return templateStringsMap.MINUTES_LABEL_SINGULAR;
 };
 
-const createTimeInWords = (
-  numbersAsWords: Array<string>,
-  templates: any,
-  definitions: any
-): Function => {
+const getConfig = (
+  config: typeof DEFINITIONS,
+  language: LANGUAGE
+): DEFINITION => {
+  return config[language];
+};
+
+const createTimeInWords = (CONFIG: typeof DEFINITIONS): Function => {
   const timeInWords = (
     hourNumeral: number,
     minuteNumeral: number,
@@ -170,8 +185,10 @@ const createTimeInWords = (
     const preposition = getPreposition(minuteNumeral);
     const minutes = getMinutes(minuteNumeral, preposition);
     const hours = getHour(hourNumeral, preposition);
-    const { cases } = templates[language];
-    const definitionsMap = definitions[language];
+    const { cases, templateReplacements, numbers } = getConfig(
+      CONFIG,
+      language
+    );
 
     for (let item = 0; item < cases.length; item++) {
       const [template, ranges] = cases[item];
@@ -184,16 +201,16 @@ const createTimeInWords = (
     }
 
     return template(templateString, {
-      minutesLabel: definitionsMap[getMinutesLabel(minutes)],
-      minutes: convertNumbersToWords(minutes),
-      hours: convertNumbersToWords(hours),
-      hourMarker: definitionsMap[HOUR_MARKER],
-      fraction: definitionsMap[getTimeFraction(minuteNumeral)],
-      preposition: definitionsMap[preposition]
+      minutesLabel: templateReplacements[getMinutesLabel(minutes)],
+      minutes: convertNumbersToWords(numbers, minutes),
+      hours: convertNumbersToWords(numbers, hours),
+      hourMarker: templateReplacements[HOUR_MARKER],
+      fraction: templateReplacements[getTimeFraction(minuteNumeral)],
+      preposition: templateReplacements[preposition]
     });
   };
 
   return timeInWords;
 };
 
-export default createTimeInWords(numbers, TEMPLATES, DEFINITIONS);
+export default createTimeInWords(CONFIG);
