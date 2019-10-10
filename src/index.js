@@ -166,27 +166,24 @@ const createTimeInWords = (
     )
       return;
 
-    const templateString = [];
+    let templateString = '';
     const preposition = getPreposition(minuteNumeral);
     const minutes = getMinutes(minuteNumeral, preposition);
     const hours = getHour(hourNumeral, preposition);
     const { cases } = templates[language];
     const definitionsMap = definitions[language];
 
-    for (let item = 0; item < cases.slice(0, cases.length - 1).length; item++) {
+    for (let item = 0; item < cases.length; item++) {
       const [template, ranges] = cases[item];
       if (ranges.includes(minuteNumeral)) {
-        templateString.push(template);
+        templateString = template;
         break;
+      } else {
+        templateString = template;
       }
     }
 
-    if (templateString.length === 0) {
-      const [template] = cases[cases.length - 1];
-      templateString.push(template);
-    }
-
-    return template(templateString.join(' '), {
+    return template(templateString, {
       minutesLabel: definitionsMap[getMinutesLabel(minutes)],
       minutes: convertNumbersToWords(minutes),
       hours: convertNumbersToWords(hours),
