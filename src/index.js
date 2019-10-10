@@ -139,8 +139,19 @@ const createTimeInWords = (
     FRACTION
   }: { [string]: string | number }
 ): Function => {
-  return (hourNumeral: number, minuteNumeral: number): string => {
+  return (hourNumeral: number, minuteNumeral: number): ?string => {
+    if (
+      hourNumeral <= 0 ||
+      minuteNumeral < 0 ||
+      hourNumeral > 12 ||
+      minuteNumeral > 59
+    )
+      return;
+
     const templateString = [];
+    const preposition = getPreposition(minuteNumeral);
+    const minutes = getMinutes(minuteNumeral, preposition);
+    const hours = getHour(hourNumeral, preposition);
 
     if (minuteNumeral === 0) {
       templateString.push(HOURS, HOUR_MARKER);
@@ -150,13 +161,10 @@ const createTimeInWords = (
       templateString.push(MINUTES, MINUTES_LABEL, PREPOSITION, HOURS);
     }
 
-    const preposition = getPreposition(minuteNumeral);
-    const minutes = getMinutes(minuteNumeral, preposition);
-
     return template(templateString.join(' '), {
       minutesLabel: templateMap[getMinutesLabel(minutes)],
       minutes: convertNumbersToWords(minutes),
-      hours: convertNumbersToWords(getHour(hourNumeral, preposition)),
+      hours: convertNumbersToWords(hours),
       hourMarker: templateMap[HOUR_MARKER],
       fraction: templateMap[getTimeFraction(minuteNumeral)],
       preposition: templateMap[preposition]

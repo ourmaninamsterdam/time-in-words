@@ -32,6 +32,14 @@ const minutesInHour = [...Array(60).keys()];
 const getNumberAsWord = number =>
   number > 20 ? `${numbers[20]} ${numbers[number % 20]}` : numbers[number];
 
+it('should return if an incorrect hour and time are passed', () => {
+  expect(timeInWords(-1, 0)).toBeUndefined();
+  expect(timeInWords(0, 0)).toBeUndefined();
+  expect(timeInWords(0, -1)).toBeUndefined();
+  expect(timeInWords(13, 0)).toBeUndefined();
+  expect(timeInWords(2, 60)).toBeUndefined();
+});
+
 it('should output the time in words "{hour} o\'clock" for on the hour', () => {
   hoursInDay.forEach(hour => {
     return expect(timeInWords(hour, 0)).toEqual(`${numbers[hour]} o'clock`);
