@@ -93,12 +93,37 @@ const getTimeFraction = (minute: number): string => {
 };
 
 const getPreposition = (number): string => {
-  if (isBetween(number, 31, 44) || number === 45) {
+  if (isBetween(number, 31, 44) || isBetween(number, 46, 59) || number === 45) {
     return templateStringsMap.PREPOSITION_TO;
-  } else if (isBetween(number, 46, 59) || number === 15 || number === 30) {
+  } else if (isBetween(number, 1, 29) || number === 15 || number === 30) {
     return templateStringsMap.PREPOSITION_PAST;
   }
   return '';
+};
+
+const getHour = (hour: number, preposition: string): number => {
+  if (preposition === templateStringsMap.PREPOSITION_PAST) {
+    return hour;
+  } else if (preposition === templateStringsMap.PREPOSITION_TO) {
+    return hour + 1;
+  }
+  return hour;
+};
+
+const getMinutes = (minutes: number, preposition: string): number => {
+  if (preposition === templateStringsMap.PREPOSITION_PAST) {
+    return minutes;
+  } else if (preposition === templateStringsMap.PREPOSITION_TO) {
+    return 60 - minutes;
+  }
+  return minutes;
+};
+
+const getMinutesLabel = (minutes: number): string => {
+  if (minutes > 1) {
+    return templateStringsMap.MINUTES_LABEL_PLURAL;
+  }
+  return templateStringsMap.MINUTES_LABEL_SINGULAR;
 };
 
 const createTimeInWords = (
@@ -107,8 +132,7 @@ const createTimeInWords = (
     HOURS,
     HOUR_MARKER,
     MINUTES,
-    MINUTES_LABEL_PLURAL,
-    MINUTES_LABEL_SINGULAR,
+    MINUTES_LABEL,
     PREPOSITION,
     QUARTER,
     HALF,
@@ -122,14 +146,20 @@ const createTimeInWords = (
       templateString.push(HOURS, HOUR_MARKER);
     } else if ([15, 30, 45].includes(minuteNumeral)) {
       templateString.push(FRACTION, PREPOSITION, HOURS);
+    } else {
+      templateString.push(MINUTES, MINUTES_LABEL, PREPOSITION, HOURS);
     }
 
+    const preposition = getPreposition(minuteNumeral);
+    const minutes = getMinutes(minuteNumeral, preposition);
+
     return template(templateString.join(' '), {
-      minutes: convertNumbersToWords(minuteNumeral),
-      hours: convertNumbersToWords(hourNumeral),
+      minutesLabel: templateMap[getMinutesLabel(minutes)],
+      minutes: convertNumbersToWords(minutes),
+      hours: convertNumbersToWords(getHour(hourNumeral, preposition)),
       hourMarker: templateMap[HOUR_MARKER],
       fraction: templateMap[getTimeFraction(minuteNumeral)],
-      preposition: templateMap[getPreposition(minuteNumeral)]
+      preposition: templateMap[preposition]
     });
   };
 };

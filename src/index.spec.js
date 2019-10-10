@@ -66,7 +66,7 @@ it('should output the time in words "{minutes} minutes to {hour}" for times betw
     .concat(minutesInHour.slice(46, 60));
   hoursInDay.forEach(hour => {
     minutesRange.forEach(minute => {
-      const diff = 60 - minute;
+      const diff = minute > 30 && minute < 60 ? 60 - minute : minute;
       return expect(timeInWords(hour, minute)).toEqual(
         `${getNumberAsWord(diff)} ${
           diff > 1 ? durationPlural : durationSingular
@@ -82,7 +82,7 @@ it('should output the time in words "{minutes} past {hour}" for times between 01
     .concat(minutesInHour.slice(16, 30));
   hoursInDay.forEach(hour => {
     minutesRange.forEach(minute => {
-      const diff = 60 - minute;
+      const diff = minute > 30 && minute < 60 ? 60 - minute : minute;
       return expect(timeInWords(hour, minute)).toEqual(
         `${getNumberAsWord(diff)} ${
           diff > 1 ? durationPlural : durationSingular
