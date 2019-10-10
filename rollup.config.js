@@ -5,7 +5,10 @@ import commonjs from 'rollup-plugin-commonjs';
 import flowEntry from 'rollup-plugin-flow-entry';
 import flow from 'rollup-plugin-flow';
 import url from 'rollup-plugin-url';
+import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
+
+const isProduction = process.env.BUILD === 'production';
 
 export default {
   input: 'src/index.js',
@@ -30,6 +33,7 @@ export default {
       exclude: '/node_modules/'
     }),
     resolve(),
-    commonjs()
+    commonjs(),
+    isProduction && terser(false)
   ]
 };
