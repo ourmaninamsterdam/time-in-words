@@ -105,16 +105,42 @@ describe('en-gb', () => {
 });
 
 describe('es-es', () => {
-  const numbers = [,];
+  const numbers = [
+    ,
+    'una',
+    'dos',
+    'tres',
+    'cuatro',
+    'cinco',
+    'seis',
+    'siete',
+    'ocho',
+    'nueve',
+    'diez',
+    'once',
+    'doce',
+    'trece',
+    'catorce',
+    'quince',
+    'dieceseis',
+    'diecesiete',
+    'dieceocho',
+    'diecenueve',
+    'viente'
+  ];
   it('should output the time in words "es la {{hour}}" for hours 1', () => {
     [1].forEach(hour => {
-      return expect(timeInWords(hour, 0)).toEqual(`${numbers[hour]} o'clock`);
+      return expect(timeInWords(hour, 0, 'es-es')).toEqual(
+        `es la ${numbers[hour]}`
+      );
     });
   });
 
   it('should output the time in words "son la {{hour}}" for hours 2-12', () => {
     hoursInDay.slice(1, 12).forEach(hour => {
-      return expect(timeInWords(hour, 0)).toEqual(`${numbers[hour]} o'clock`);
+      return expect(timeInWords(hour, 0, 'es-es')).toEqual(
+        `son las ${numbers[hour]}`
+      );
     });
   });
 });
