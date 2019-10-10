@@ -1,6 +1,7 @@
 // @flow
 
-const numbers = [,
+const numbers = [
+  ,
   'one',
   'two',
   'three',
@@ -20,58 +21,82 @@ const numbers = [,
   'seventeen',
   'eighteen',
   'nineteen',
-  'twenty',
+  'twenty'
 ];
 
-const createTimeInWords = (numbersAsWords: Array<string>): function => {
+const templateStrings = {
+  HOUR_MARKER: '{{hourMarker}}',
+  HOURS: '{{hours}}',
+  MINUTES: '{{minutes}}',
+  MINUTES_LABEL_PLURAL: '{{minutesLabelPlural}}',
+  MINUTES_LABEL_SINGULAR: '{{minutesLabelSingular}}',
+  PREPOSITION_TO: '{{prepositionTo}}',
+  PREPOSITION_PAST: '{{prepositionPast}}',
+  QUARTER: '{{quarter}}',
+  HALF: '{{half}}'
+};
+
+const templateMap = {
+  [templateStrings.HOUR_MARKER]: "o'clock",
+  [templateStrings.QUARTER]: 'quarter',
+  [templateStrings.HALF]: 'half',
+  [templateStrings.PREPOSITION_PAST]: 'past',
+  [templateStrings.PREPOSITION_TO]: 'to',
+  [templateStrings.MINUTES_LABEL_PLURAL]: 'minutes',
+  [templateStrings.MINUTES_LABEL_SINGULAR]: 'minute'
+};
+
+const isBetween = (x: number, min: number, max: number): boolean =>
+  x >= min && x <= max;
+
+const template = (
+  templateString: string,
+  variables: { [string]: string | number }
+): string =>
+  templateString.replace(/{{([^{}]*)}}/g, (a: string, b: string): string => {
+    const r = variables[b];
+    return typeof r === 'string' || typeof r === 'number' ? r.toString() : a;
+  });
+
+const convertNumbersToWords = (number: number): string => {
+  return number >= 20
+    ? number
+        .toString()
+        .split('')
+        .map(number => numbers[parseInt(number, 10)])
+        .join(' ')
+    : numbers[number];
+};
+
+const createTimeInWords = (
+  numbersAsWords: Array<string>,
+  {
+    HOURS,
+    HOUR_MARKER,
+    MINUTES,
+    MINUTES_LABEL_PLURAL,
+    MINUTES_LABEL_SINGULAR,
+    PREPOSITION_PAST,
+    PREPOSITION_TO,
+    QUARTER,
+    HALF
+  }: { [string]: string | number }
+): Function => {
   return (hourNumeral: number, minuteNumeral: number): string => {
-    let output = [];
-    const prepositions = {
-      past: 'past',
-      to: 'to',
-    };
-    const quarterMarks = [0,15,30,45];
-    const durationPlural = 'minutes';
-    const durationSingular = 'minute';
+    const templateString = [];
+    const minutesAsWord = convertNumbersToWords(minuteNumeral);
+    const hoursAsWord = convertNumbersToWords(hourNumeral);
 
-    if (quarterMarks.includes(minuteNumeral) ) {
-      if (minuteNumeral === 0) {
-        output.push(numbersAsWords[hourNumeral], 'o\'clock');
-      }
-
-      if (minuteNumeral === 15) {
-        output.push('quarter', prepositions.past, numbersAsWords[hourNumeral]);
-      }
-
-      if (minuteNumeral === 30) {
-        output.push('half', prepositions.past, numbersAsWords[hourNumeral]);
-      }
-
-      if (minuteNumeral === 45) {
-        output.push('quarter', prepositions.to, numbersAsWords[hourNumeral]);
-      }
-    }
-    else {
-      if(minuteNumeral > 30 && minuteNumeral < 45 || minuteNumeral > 45 && minuteNumeral < 60) {
-        const minutesDifference = 60 - minuteNumeral;
-        const numberAsWord = minutesDifference > 20
-            ? `${numbers[20]} ${numbers[minutesDifference % 20]}`
-            : numbers[minutesDifference];
-        const duration = minutesDifference > 1? durationPlural : durationSingular;
-        output.push(numberAsWord, duration, prepositions.to, numbersAsWords[hourNumeral+1])
-      }
-      else if(minuteNumeral >= 1 && minuteNumeral < 45 && (minuteNumeral !== 15 || minuteNumeral !== 30)) {
-        const minutesDifference = 60 - minuteNumeral;
-        const numberAsWord = minutesDifference > 20
-            ? `${numbers[20]} ${numbers[minutesDifference % 20]}`
-            : numbers[minutesDifference];
-        const duration = minutesDifference > 1? durationPlural : durationSingular;
-        output.push(numberAsWord, duration, prepositions.past, numbersAsWords[hourNumeral])
-      }
+    if (minuteNumeral === 0) {
+      templateString.push(HOURS, HOUR_MARKER);
     }
 
-    return output.join(' ');
+    return template(templateString.join(' '), {
+      minutes: minutesAsWord,
+      hours: hoursAsWord,
+      hourMarker: templateMap[HOUR_MARKER]
+    });
   };
 };
 
-export default createTimeInWords(numbers);
+export default createTimeInWords(numbers, templateStrings);
