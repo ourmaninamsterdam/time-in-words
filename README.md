@@ -1,6 +1,18 @@
-# library-template
+# time-in-words
 
-Setup for building JavaScript libraries (using Rollup) with the following: Babel (7.x), Jest, Flow (0.75), ESLint and Prettier.
+Returns the time in words (for English) given an hour and minute parameters. 
+
+Examples
+
+```
+timeInWords(1, 01) // one o'clock
+timeInWords(1, 01) // one minute past one
+timeInWords(1, 08) // eight minutes past one
+timeInWords(1, 15) // fifteen minutes past one
+timeInWords(1, 30) // half past one
+timeInWords(1, 45) // quarter to two
+timeInWords(1, 56) // four minutes to two
+```
 
 ## Setup
 
