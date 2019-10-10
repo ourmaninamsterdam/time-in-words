@@ -1,14 +1,15 @@
 {
-  "name": "js-library-template",
+  "name": "time-in-words",
   "author": "Justin Perry",
-  "version": "0.0.0",
-  "description": "Base config for a JavaScript library. Includes Rollup, Prettier, ESLint, Babel and Flow",
-  "repository": "js-library-template",
+  "version": "1.0.0",
+  "description": "Returns the time in words (in English) given valid hour and minute parameters.",
+  "repository": "https://github.com/ourmaninamsterdam/time-in-words",
   "scripts": {
     "test": "jest --env=jsdom",
     "test:watch": "jest --watchAll --env=jsdom",
     "test:ci": "jest --ci",
     "prepare": "yarn run build",
+    "prepublish": "yarn run build",
     "build": "rollup -c",
     "start": "rollup -c -w"
   },
