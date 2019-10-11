@@ -14,7 +14,7 @@ Examples
 timeInWords(1, 01) // one o'clock
 timeInWords(1, 01) // one minute past one
 timeInWords(1, 08) // eight minutes past one
-timeInWords(1, 15) // fifteen minutes past one
+timeInWords(1, 15) // quarter past one
 timeInWords(1, 30) // half past one
 timeInWords(1, 45) // quarter to two
 timeInWords(1, 56) // four minutes to two
