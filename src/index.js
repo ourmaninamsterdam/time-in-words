@@ -1,8 +1,9 @@
 // @flow
 
-const LANGUAGE_ENGLISH = 'en';
+const LANGUAGE_EN_GB = 'en-gb';
+const LANGUAGE_ES_ES = 'es-es';
 
-type LANGUAGE = typeof LANGUAGE_ENGLISH;
+type LANGUAGE = typeof LANGUAGE_EN_GB | typeof LANGUAGE_ES_ES;
 type DEFINITION = {
   cases: Array<any>,
   numbers: Array<?string>,
@@ -21,6 +22,9 @@ const PREPOSITION_PAST = 'PREPOSITION_PAST';
 const QUARTER = 'QUARTER';
 const HALF = 'HALF';
 const HOUR_MARKER = 'HOUR_MARKER';
+const CONJUCTION = 'CONJUCTION';
+const ARTICLE_DEFINITE = 'ARTICLE';
+const ARTICLE_INDEFINITE = 'ARTICLE_INDEFINITE';
 
 const templateStrings = {
   HOUR_MARKER: '{{hourMarker}}',
@@ -28,7 +32,9 @@ const templateStrings = {
   MINUTES: '{{minutes}}',
   MINUTES_LABEL: '{{minutesLabel}}',
   PREPOSITION: '{{preposition}}',
-  FRACTION: '{{fraction}}'
+  FRACTION: '{{fraction}}',
+  CONJUCTION: '{{conjuction}}',
+  ARTICLE: '{{article}}'
 };
 
 const templateStringsMap = {
@@ -37,7 +43,10 @@ const templateStringsMap = {
   PREPOSITION_TO: 'PREPOSITION_TO',
   PREPOSITION_PAST: 'PREPOSITION_PAST',
   QUARTER: 'QUARTER',
-  HALF: 'HALF'
+  HALF: 'HALF',
+  CONJUCTION: 'CONJUCTION',
+  ARTICLE_DEFINITE: 'ARTICLE',
+  ARTICLE_INDEFINITE: 'ARTICLE_INDEFINITE'
 };
 
 const CASES_ENGLISH = [
@@ -46,8 +55,14 @@ const CASES_ENGLISH = [
   ['{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}', []]
 ];
 
+const CASES_SPANISH = [
+  ['{{article}} {{hours}}', [0]],
+  ['{{fraction}} {{preposition}} {{hours}}', [15, 30, 45]],
+  ['{{minutes}} {{minutesLabel}} {{preposition}} {{hours}}', []]
+];
+
 const DEFINITIONS: TYPE_DEFINITIONS = {
-  [LANGUAGE_ENGLISH]: {
+  [LANGUAGE_EN_GB]: {
     cases: CASES_ENGLISH,
     numbers: [
       ,
@@ -81,11 +96,50 @@ const DEFINITIONS: TYPE_DEFINITIONS = {
       [MINUTES_LABEL_PLURAL]: 'minutes',
       [MINUTES_LABEL_SINGULAR]: 'minute'
     }
+  },
+  [LANGUAGE_ES_ES]: {
+    cases: CASES_SPANISH,
+    numbers: [
+      ,
+      'una',
+      'dos',
+      'tres',
+      'cuatro',
+      'cinco',
+      'seis',
+      'siete',
+      'ocho',
+      'nueve',
+      'diez',
+      'once',
+      'doce',
+      'trece',
+      'catorce',
+      'quince',
+      'dieceseis',
+      'diecesiete',
+      'dieceocho',
+      'diecenueve',
+      'viente'
+    ],
+    templateReplacements: {
+      [HOUR_MARKER]: '',
+      [QUARTER]: 'cuarto',
+      [HALF]: 'media',
+      [CONJUCTION]: 'y',
+      [ARTICLE_DEFINITE]: 'es la',
+      [ARTICLE_INDEFINITE]: 'sonl as',
+      [PREPOSITION_PAST]: '',
+      [PREPOSITION_TO]: '',
+      [MINUTES_LABEL_PLURAL]: '',
+      [MINUTES_LABEL_SINGULAR]: ''
+    }
   }
 };
 
 const CONFIG = {
-  [LANGUAGE_ENGLISH]: DEFINITIONS[LANGUAGE_ENGLISH]
+  [LANGUAGE_EN_GB]: DEFINITIONS[LANGUAGE_EN_GB],
+  [LANGUAGE_ES_ES]: DEFINITIONS[LANGUAGE_ES_ES]
 };
 
 const isBetween = (x: number, min: number, max: number): boolean =>
@@ -171,7 +225,7 @@ const createTimeInWords = (CONFIG: typeof DEFINITIONS): Function => {
   const timeInWords = (
     hourNumeral: number,
     minuteNumeral: number,
-    language: LANGUAGE = 'en'
+    language: LANGUAGE = 'en-gb'
   ): ?string => {
     if (
       hourNumeral <= 0 ||
