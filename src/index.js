@@ -139,7 +139,7 @@ const getHour = (hour: number, preposition: string): number => {
   if (preposition === templateStringsMap.PREPOSITION_PAST) {
     return hour;
   } else if (preposition === templateStringsMap.PREPOSITION_TO) {
-    return hour + 1;
+    return hour === 12 ? 1 : hour + 1;
   }
   return hour;
 };
